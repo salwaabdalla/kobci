@@ -7,12 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        sand: '#FBF4EC',
-        terracotta: '#C4623B',
-        brown: '#2C1810',
-        gold: '#E8A020',
+        sand: '#FFF0F5',
+        terracotta: '#C2185B',
+        brown: '#4A0028',
+        gold: '#E91E8C',
         teal: '#1D9E75',
-        muted: '#7A5C4A',
+        muted: '#880E4F',
       },
       fontFamily: {
         heading: ['"Playfair Display"', 'serif'],

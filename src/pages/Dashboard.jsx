@@ -71,6 +71,13 @@ export default function Dashboard() {
   const weekExpense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
   const weekProfit = weekIncome - weekExpense
 
+  const lastWeekStart = new Date(weekStart)
+  lastWeekStart.setDate(lastWeekStart.getDate() - 7)
+  const lastWeekIncome = transactions
+    .filter(t => { const d = new Date(t.date); return d >= lastWeekStart && d < weekStart })
+    .filter(t => t.type === 'income')
+    .reduce((s, t) => s + t.amount, 0)
+
   const todayStr = today.toDateString()
   const todayTransactions = transactions.filter(t => new Date(t.date).toDateString() === todayStr)
   const todayIncome = todayTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
@@ -127,21 +134,51 @@ export default function Dashboard() {
         <p className="text-muted text-sm mt-1">{formatSomaliDate(today)}</p>
       </div>
 
-      {/* Forecast locked notice */}
-      {!forecastUnlocked && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
-          <span className="text-amber-500 text-xl">📊</span>
-          <div>
-            <p className="font-medium text-amber-800 text-sm">
-              Saadaalinta weli kuma furna
-            </p>
-            <p className="text-amber-700 text-xs mt-0.5">
-              Diiwaangeli 14 maalmood oo iib ah si aad saadaalinta xilliga u hesho.
-              Hadda: {uniqueSaleDays} / 14 maalmood.
+      {/* Forecast preview */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">📊</span>
+            <h2 className="font-heading font-semibold text-brown text-sm">Saadaalinta Dakhliga</h2>
+          </div>
+          <button
+            onClick={() => navigate('/forecast')}
+            className="text-xs text-terracotta font-medium hover:underline"
+          >
+            Eeg dhamaystiran →
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="bg-amber-50 rounded-lg py-3 px-2">
+            <p className="text-muted text-xs mb-1">Toddobaadkii hore</p>
+            <p className="font-heading font-bold text-brown text-sm">
+              {lastWeekIncome > 0 ? `${lastWeekIncome.toLocaleString()} sh` : '—'}
             </p>
           </div>
+          <div className="bg-teal bg-opacity-10 rounded-lg py-3 px-2">
+            <p className="text-muted text-xs mb-1">Toddobaadkan</p>
+            <p className="font-heading font-bold text-teal text-sm">
+              {weekIncome > 0 ? `${weekIncome.toLocaleString()} sh` : '—'}
+            </p>
+          </div>
+          <div className="bg-amber-50 rounded-lg py-3 px-2">
+            <p className="text-muted text-xs mb-1">Saadaal</p>
+            {weekIncome > 0 ? (
+              <p className={`font-heading font-bold text-sm flex items-center justify-center gap-0.5 ${weekIncome >= lastWeekIncome ? 'text-green-600' : 'text-red-500'}`}>
+                {weekIncome >= lastWeekIncome ? '↑' : '↓'}
+                {weekIncome.toLocaleString()} sh
+              </p>
+            ) : (
+              <p className="font-heading font-bold text-muted text-sm">—</p>
+            )}
+          </div>
         </div>
-      )}
+        {weekIncome === 0 && (
+          <p className="text-center text-muted text-xs mt-3">
+            Dakhlig diiwaangeli si saadaalinta u bilowdo
+          </p>
+        )}
+      </div>
 
       {/* Slow period warning */}
       {slowWarning && (
@@ -230,10 +267,10 @@ export default function Dashboard() {
           </div>
           <div className="relative w-16 h-16">
             <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#FBF4EC" strokeWidth="3" />
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#FFF0F5" strokeWidth="3" />
               <circle
                 cx="18" cy="18" r="15.9" fill="none"
-                stroke={businessScore >= 80 ? '#1D9E75' : businessScore >= 60 ? '#E8A020' : '#C4623B'}
+                stroke={businessScore >= 80 ? '#1D9E75' : businessScore >= 60 ? '#E91E8C' : '#C2185B'}
                 strokeWidth="3"
                 strokeDasharray={`${businessScore} 100`}
               />

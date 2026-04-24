@@ -3,17 +3,17 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 
 const navItems = [
-  { path: '/dashboard', label: 'Guriga', icon: '🏠' },
-  { path: '/coach', label: 'Macallinka AI', icon: '🤖' },
-  { path: '/money', label: 'Lacagta', icon: '💰' },
-  { path: '/stock', label: 'Kaydka', icon: '📦' },
-  { path: '/suppliers', label: 'Alaab-siiyayaasha', icon: '🤝' },
-  { path: '/mentors', label: 'Tutorrada', icon: '👩‍🏫' },
-  { path: '/forecast', label: 'Saadaalinta', icon: '📊' },
-  { path: '/business-plan', label: 'Ganacsiga', icon: '📋' },
-  { path: '/grow', label: 'Kobcinta', icon: '🌱' },
-  { path: '/inspire', label: 'Dhiiri-gelin', icon: '⭐' },
-  { path: '/settings', label: 'Xogta', icon: '⚙️' },
+  { path: '/dashboard', label: 'Guriga' },
+  { path: '/coach', label: 'Macallinka AI' },
+  { path: '/money', label: 'Lacagta' },
+  { path: '/stock', label: 'Kaydka' },
+  { path: '/suppliers', label: 'Alaab-siiyayaasha' },
+  { path: '/mentors', label: 'Tutorrada' },
+  { path: '/forecast', label: 'Saadaalinta' },
+  { path: '/business-plan', label: 'Ganacsiga' },
+  { path: '/grow', label: 'Kobcinta' },
+  { path: '/inspire', label: 'Dhiiri-gelin' },
+  { path: '/settings', label: 'Xogta' },
 ]
 
 const mobileNavItems = navItems.slice(0, 5)
@@ -24,7 +24,7 @@ export default function Navigation() {
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const activeClass = 'bg-terracotta text-white'
+  const activeClass = 'bg-terracotta text-white font-bold'
   const inactiveClass = 'text-muted hover:bg-sand hover:text-brown'
 
   const handleLogout = async () => {
@@ -35,7 +35,7 @@ export default function Navigation() {
 
   return (
     <>
-      <aside className="hidden md:flex flex-col w-60 min-h-screen bg-white border-r border-amber-100 fixed left-0 top-0 z-30">
+      <aside className="hidden md:flex flex-col w-60 bg-white border-r border-amber-100 fixed left-0 top-0 z-30" style={{ height: '100vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
         <div className="bg-brown text-white p-5">
           <h1 className="font-heading text-2xl font-bold text-gold">Kobcin</h1>
           {userProfile && (
@@ -54,10 +54,9 @@ export default function Navigation() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive ? activeClass : inactiveClass}`}
+              className={({ isActive }) => `flex items-center px-3 py-2.5 rounded-lg text-sm transition-all ${isActive ? activeClass : inactiveClass}`}
             >
-              <span className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
+              {item.label}
             </NavLink>
           ))}
         </nav>
@@ -102,10 +101,9 @@ export default function Navigation() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setSidebarOpen(false)}
-                  className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive ? activeClass : inactiveClass}`}
+                  className={({ isActive }) => `flex items-center px-3 py-2.5 rounded-lg text-sm transition-all ${isActive ? activeClass : inactiveClass}`}
                 >
-                  <span className="text-base">{item.icon}</span>
-                  <span>{item.label}</span>
+                  {item.label}
                 </NavLink>
               ))}
             </nav>
@@ -124,8 +122,7 @@ export default function Navigation() {
           const isActive = location.pathname === item.path
           return (
             <NavLink key={item.path} to={item.path} className="flex-1 flex flex-col items-center py-2 gap-0.5">
-              <span className="text-lg">{item.icon}</span>
-              <span className={`text-xs ${isActive ? 'text-terracotta font-medium' : 'text-muted'}`}>
+              <span className={`text-xs font-medium ${isActive ? 'text-terracotta' : 'text-muted'}`}>
                 {item.label.split(' ')[0]}
               </span>
             </NavLink>

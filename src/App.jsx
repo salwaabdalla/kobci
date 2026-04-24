@@ -2,6 +2,7 @@ import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useApp } from './context/AppContext'
 import Navigation from './components/Navigation'
+import SplashScreen from './pages/SplashScreen'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
@@ -22,7 +23,7 @@ function FullScreenLoader() {
     <div className="min-h-screen bg-sand flex flex-col items-center justify-center px-4">
       <div
         className="w-10 h-10 rounded-full border-4 border-amber-100 border-t-transparent animate-spin mb-4"
-        style={{ borderTopColor: '#C4623B' }}
+        style={{ borderTopColor: '#C2185B' }}
       />
       <p className="font-heading text-xl text-brown">Xogta la soo rarayo...</p>
     </div>
@@ -107,7 +108,7 @@ export default function App() {
     <>
       {networkWarning && <NetworkBanner />}
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<SplashScreen />} />
         <Route
           path="/login"
           element={(
