@@ -7,7 +7,7 @@ const QUESTIONS = [
   { field: 'whatYouSell', label: 'Maxaad iibisaa?', placeholder: 'Sifee alaabta ama adeegga' },
   { field: 'targetCustomer', label: 'Macaamiishaada Bartilmaameedka', placeholder: 'Cidda aad u iibisid?' },
   { field: 'competitiveAdvantage', label: 'Maxaad ka duwan tahay tartanka?', placeholder: 'Qiimaha jaban, tayo sarreeya, deegaan...' },
-  { field: 'monthlyGoal', label: 'Bartilmaameedka Dakhliga Bishii', placeholder: 'Wixii shilin ahaan' },
+  { field: 'monthlyGoal', label: 'Bartilmaameedka Dakhliga Bishii', placeholder: 'Wixii dollar ahaan' },
   { field: 'biggestChallenge', label: 'Caqabadda ugu weyn', placeholder: 'Maxaad u baahan tahay caawimaad?' },
 ]
 
@@ -45,7 +45,7 @@ Magaca Ganacsiga: ${form.businessName}
 Waxa la Iibinayo: ${form.whatYouSell}
 Macaamiisha Bartilmaameedka: ${form.targetCustomer}
 Kala duwanaanshaha Tartanka: ${form.competitiveAdvantage}
-Bartilmaameedka Dakhliga Bishii: ${form.monthlyGoal} shilin
+Bartilmaameedka Dakhliga Bishii: ${form.monthlyGoal} dollar
 Caqabadda ugu Weyn: ${form.biggestChallenge}
 
 Qorshuhu ha ka koobnaado: 1) Soo-koobid, 2) Cilmi baarista suuqa, 3) Alaabta/Adeegga, 4) Qorshaha Suuqgeynta, 5) Qorshaha Maaliyadda, 6) Hadafyada 6-bilood. Soomaali buuxda ah si qumman u qor.`

@@ -5,7 +5,7 @@ function buildSystemPrompt(businessProfile) {
     `Magaca: ${profile.name || 'Lama garanayo'}`,
     `Ganacsiga: ${profile.businessName || 'Lama garanayo'}`,
     `Waxa iibiya: ${profile.whatYouSell || 'Lama garanayo'}`,
-    `Dakhliga usbuuciga ah: ${profile.weeklyIncome || 'Lama garanayo'} shilin`,
+    `Dakhliga usbuuciga ah: ${profile.weeklyIncome || 'Lama garanayo'} dollar`,
     `Caqabadda ugu weyn: ${profile.biggestChallenge || 'Lama garanayo'}`,
   ].join('\n')
 

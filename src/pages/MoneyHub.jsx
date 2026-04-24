@@ -212,7 +212,7 @@ export default function MoneyHub() {
           </div>
 
           <div>
-            <label className="text-sm text-muted mb-1 block">Xaddiga (shilin)</label>
+            <label className="text-sm text-muted mb-1 block">Xaddiga (dollar)</label>
             <input
               type="number"
               value={amount}
@@ -314,7 +314,7 @@ export default function MoneyHub() {
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                         <span className={`font-bold text-sm ${transaction.type === 'income' ? 'text-teal' : 'text-red-500'}`}>
-                          {transaction.type === 'income' ? '+' : '-'}{Number(transaction.amount || 0).toLocaleString()} sh
+                          {transaction.type === 'income' ? '+' : '-'}{Number(transaction.amount || 0).toLocaleString()} $
                         </span>
                         <button onClick={() => startEditTx(transaction)} className="text-muted hover:text-brown p-1 transition-colors text-base" title="Wax ka beddel">
                           ✏️
@@ -425,9 +425,9 @@ export default function MoneyHub() {
                 <div className="h-full bg-teal rounded-full transition-all" style={{ width: `${savingsProgress}%` }} />
               </div>
               <div className="flex justify-between text-sm items-center">
-                <span className="font-bold text-teal">{Number(savingsGoal.current || 0).toLocaleString()} sh</span>
+                <span className="font-bold text-teal">{Number(savingsGoal.current || 0).toLocaleString()} $</span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-muted">/ {Number(savingsGoal.target || 0).toLocaleString()} sh</span>
+                  <span className="text-muted">/ {Number(savingsGoal.target || 0).toLocaleString()} $</span>
                   <button
                     onClick={() => {
                       setEditingGoalTarget(true)

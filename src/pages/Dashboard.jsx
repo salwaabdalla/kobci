@@ -152,13 +152,13 @@ export default function Dashboard() {
           <div className="bg-amber-50 rounded-lg py-3 px-2">
             <p className="text-muted text-xs mb-1">Toddobaadkii hore</p>
             <p className="font-heading font-bold text-brown text-sm">
-              {lastWeekIncome > 0 ? `${lastWeekIncome.toLocaleString()} sh` : '—'}
+              {lastWeekIncome > 0 ? `${lastWeekIncome.toLocaleString()} $` : '—'}
             </p>
           </div>
           <div className="bg-teal bg-opacity-10 rounded-lg py-3 px-2">
             <p className="text-muted text-xs mb-1">Toddobaadkan</p>
             <p className="font-heading font-bold text-teal text-sm">
-              {weekIncome > 0 ? `${weekIncome.toLocaleString()} sh` : '—'}
+              {weekIncome > 0 ? `${weekIncome.toLocaleString()} $` : '—'}
             </p>
           </div>
           <div className="bg-amber-50 rounded-lg py-3 px-2">
@@ -166,7 +166,7 @@ export default function Dashboard() {
             {weekIncome > 0 ? (
               <p className={`font-heading font-bold text-sm flex items-center justify-center gap-0.5 ${weekIncome >= lastWeekIncome ? 'text-green-600' : 'text-red-500'}`}>
                 {weekIncome >= lastWeekIncome ? '↑' : '↓'}
-                {weekIncome.toLocaleString()} sh
+                {weekIncome.toLocaleString()} $
               </p>
             ) : (
               <p className="font-heading font-bold text-muted text-sm">—</p>
@@ -207,7 +207,7 @@ export default function Dashboard() {
           <p className="text-muted text-xs mb-1">Dakhliga toddobaadka</p>
           {weekIncome > 0 ? (
             <p className="font-heading text-xl font-bold text-teal">
-              {animIncome.toLocaleString()} sh
+              {animIncome.toLocaleString()} $
             </p>
           ) : (
             <p className="font-heading text-xl font-bold text-muted">—</p>
@@ -217,7 +217,7 @@ export default function Dashboard() {
           <p className="text-muted text-xs mb-1">Faa'iidada toddobaadka</p>
           {transactions.length > 0 ? (
             <p className={`font-heading text-xl font-bold ${weekProfit >= 0 ? 'text-teal' : 'text-red-500'}`}>
-              {weekProfit < 0 ? '-' : ''}{animProfit.toLocaleString()} sh
+              {weekProfit < 0 ? '-' : ''}{animProfit.toLocaleString()} $
             </p>
           ) : (
             <p className="font-heading text-xl font-bold text-muted">—</p>
@@ -251,8 +251,8 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex justify-between text-xs text-muted">
-              <span>{animSavingsCurrent.toLocaleString()} sh</span>
-              <span>{savingsGoal.target.toLocaleString()} sh</span>
+              <span>{animSavingsCurrent.toLocaleString()} $</span>
+              <span>{savingsGoal.target.toLocaleString()} $</span>
             </div>
           </div>
         )}

@@ -13,7 +13,7 @@ const steps = [
   { field: 'name', question: 'Magacaaga waa maxay?', placeholder: 'Gali magacaaga...', type: 'text' },
   { field: 'businessName', question: 'Ganacsigaaga magaciisa?', placeholder: 'Gali magaca ganacsiga...', type: 'text' },
   { field: 'whatYouSell', question: 'Maxaad iibisaa?', placeholder: 'Tusaale: cunto, dharka, alaabta guriga...', type: 'text' },
-  { field: 'weeklyIncome', question: 'Maalintiiba intee inaad kasoo dakhli? (shilin ahaan)', placeholder: 'Tusaale: 50000', type: 'number' },
+  { field: 'weeklyIncome', question: 'Maalintiiba imisa ayaa kusoo gasho?', placeholder: 'Tusaale: 50000', type: 'number' },
   { field: 'biggestChallenge', question: 'Caqabadda ugu weyn ee aad wajaheyso?', type: 'choice' },
 ]
 
