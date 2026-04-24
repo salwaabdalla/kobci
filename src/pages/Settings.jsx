@@ -9,8 +9,8 @@ const CHALLENGES = [
 ]
 
 export default function Settings() {
-  const { userProfile, setUserProfile } = useApp()
-
+  const { userProfile, updateProfile } = useApp()
+  const [saved, setSaved] = useState(false)
   const [form, setForm] = useState({
     name: userProfile?.name || '',
     businessName: userProfile?.businessName || '',
@@ -19,11 +19,10 @@ export default function Settings() {
     biggestChallenge: userProfile?.biggestChallenge || '',
   })
 
-  const [saved, setSaved] = useState(false)
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name.trim() || !form.businessName.trim()) return
-    setUserProfile({
+
+    await updateProfile({
       ...userProfile,
       name: form.name.trim(),
       businessName: form.businessName.trim(),
@@ -31,6 +30,7 @@ export default function Settings() {
       weeklyIncome: Number(form.weeklyIncome) || 0,
       biggestChallenge: form.biggestChallenge,
     })
+
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
   }
@@ -52,7 +52,7 @@ export default function Settings() {
           <label className="text-sm font-medium text-brown mb-1 block">Magacaaga</label>
           <input
             value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
+            onChange={(event) => setForm({ ...form, name: event.target.value })}
             placeholder="Magacaaga"
             className="input-field"
           />
@@ -62,7 +62,7 @@ export default function Settings() {
           <label className="text-sm font-medium text-brown mb-1 block">Magaca Ganacsiga</label>
           <input
             value={form.businessName}
-            onChange={e => setForm({ ...form, businessName: e.target.value })}
+            onChange={(event) => setForm({ ...form, businessName: event.target.value })}
             placeholder="Magaca ganacsigaaga"
             className="input-field"
           />
@@ -72,7 +72,7 @@ export default function Settings() {
           <label className="text-sm font-medium text-brown mb-1 block">Maxaad iibisaa?</label>
           <input
             value={form.whatYouSell}
-            onChange={e => setForm({ ...form, whatYouSell: e.target.value })}
+            onChange={(event) => setForm({ ...form, whatYouSell: event.target.value })}
             placeholder="Alaabta ama adeegga aad iibiso"
             className="input-field"
           />
@@ -84,7 +84,7 @@ export default function Settings() {
           <input
             type="number"
             value={form.weeklyIncome}
-            onChange={e => setForm({ ...form, weeklyIncome: e.target.value })}
+            onChange={(event) => setForm({ ...form, weeklyIncome: event.target.value })}
             placeholder="0"
             className="input-field"
           />
@@ -94,19 +94,19 @@ export default function Settings() {
           <label className="text-sm font-medium text-brown mb-1 block">Caqabadda ugu Weyn</label>
           <select
             value={form.biggestChallenge}
-            onChange={e => setForm({ ...form, biggestChallenge: e.target.value })}
+            onChange={(event) => setForm({ ...form, biggestChallenge: event.target.value })}
             className="input-field"
           >
             <option value="">Dooro...</option>
-            {CHALLENGES.map(c => (
-              <option key={c} value={c}>{c}</option>
+            {CHALLENGES.map((challenge) => (
+              <option key={challenge} value={challenge}>{challenge}</option>
             ))}
           </select>
           <p className="text-xs text-muted mt-1">Tani waxay doortaa macallinka AI iyo dhiirigelinta ku habboon.</p>
         </div>
 
         <button
-          onClick={handleSave}
+          onClick={() => void handleSave()}
           disabled={!form.name.trim() || !form.businessName.trim()}
           className="btn-primary w-full py-3"
         >
@@ -117,7 +117,7 @@ export default function Settings() {
       <div className="card">
         <h2 className="font-heading font-semibold text-brown mb-2">Macluumaad</h2>
         <p className="text-muted text-xs leading-relaxed">
-          Wax kasta oo aad halkan ka beddesho ayaa isla markiiba saamayn doona dhammaan bogagga: AI Coach, saadaalinta, iyo macallinka. Xogta waxaa lagu kaydiyaa taleefantaada oo kaliya — ma aadayso server kasta.
+          Wax kasta oo aad halkan ka beddesho ayaa isla markiiba saamayn doona dhammaan bogagga: AI Coach, saadaalinta, iyo macallinka. Xogta waxaa hadda lagu kaydiyaa Supabase iyo cache ku meel gaar ah oo browser-ka ah.
         </p>
       </div>
     </div>

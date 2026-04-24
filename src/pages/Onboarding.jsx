@@ -19,49 +19,54 @@ const steps = [
 
 export default function Onboarding() {
   const navigate = useNavigate()
-  const { setUserProfile } = useApp()
+  const { user, updateProfile } = useApp()
   const [step, setStep] = useState(0)
+  const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
-    name: '',
+    name: user?.user_metadata?.full_name || '',
     businessName: '',
     whatYouSell: '',
     weeklyIncome: '',
     biggestChallenge: '',
-    startDate: new Date().toISOString(),
   })
 
   const current = steps[step]
   const progress = ((step + 1) / steps.length) * 100
 
   const canProceed = () => {
-    const val = form[current.field]
-    return val && val.toString().trim().length > 0
+    const value = form[current.field]
+    return value && value.toString().trim().length > 0
   }
 
-  const next = () => {
+  const next = async () => {
+    if (saving) return
+
     if (step < steps.length - 1) {
       setStep(step + 1)
-    } else {
-      setUserProfile({ ...form, weeklyIncome: Number(form.weeklyIncome) })
-      navigate('/dashboard')
+      return
     }
+
+    setSaving(true)
+    await updateProfile({
+      ...form,
+      weeklyIncome: Number(form.weeklyIncome),
+    })
+    setSaving(false)
+    navigate('/dashboard')
   }
 
-  const handleInput = (val) => {
-    setForm({ ...form, [current.field]: val })
+  const handleInput = (value) => {
+    setForm((prev) => ({ ...prev, [current.field]: value }))
   }
 
   return (
     <div className="min-h-screen bg-sand flex flex-col items-center justify-center px-4">
-      {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="font-heading text-3xl font-bold text-brown">Kobcin</h1>
         <p className="text-muted text-sm mt-1">Ganacsigaaga kor u qaad</p>
       </div>
 
-      {/* Card */}
       <div className="card w-full max-w-md">
-        {/* Progress bar */}
         <div className="mb-6">
           <div className="flex justify-between text-xs text-muted mb-2">
             <span>Tallaabada {step + 1} / {steps.length}</span>
@@ -75,25 +80,23 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Question */}
         <h2 className="font-heading text-2xl font-semibold text-brown mb-6">
           {current.question}
         </h2>
 
-        {/* Input */}
         {current.type === 'choice' ? (
           <div className="grid grid-cols-2 gap-3 mb-6">
-            {CHALLENGE_OPTIONS.map((opt) => (
+            {CHALLENGE_OPTIONS.map((option) => (
               <button
-                key={opt}
-                onClick={() => handleInput(opt)}
+                key={option}
+                onClick={() => handleInput(option)}
                 className={`p-3 rounded-lg border-2 text-sm font-medium transition-all text-left ${
-                  form.biggestChallenge === opt
+                  form.biggestChallenge === option
                     ? 'border-terracotta bg-terracotta bg-opacity-10 text-terracotta'
                     : 'border-amber-200 text-muted hover:border-terracotta hover:text-terracotta'
                 }`}
               >
-                {opt}
+                {option}
               </button>
             ))}
           </div>
@@ -101,41 +104,36 @@ export default function Onboarding() {
           <input
             type={current.type}
             value={form[current.field]}
-            onChange={(e) => handleInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && canProceed() && next()}
+            onChange={(event) => handleInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && canProceed()) {
+                void next()
+              }
+            }}
             placeholder={current.placeholder}
             className="input-field mb-6 text-lg"
             autoFocus
           />
         )}
 
-        {/* Buttons */}
         <div className="flex gap-3">
           {step > 0 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="btn-secondary flex-1"
-            >
+            <button onClick={() => setStep(step - 1)} className="btn-secondary flex-1">
               Dib u noqo
             </button>
           )}
-          <button
-            onClick={next}
-            disabled={!canProceed()}
-            className="btn-primary flex-1"
-          >
-            {step === steps.length - 1 ? 'Bilow Kobcin ✓' : 'Xigta →'}
+          <button onClick={() => void next()} disabled={!canProceed() || saving} className="btn-primary flex-1">
+            {step === steps.length - 1 ? (saving ? '...' : 'Bilow Kobcin ✓') : 'Xigta →'}
           </button>
         </div>
       </div>
 
-      {/* Step indicators */}
       <div className="flex gap-2 mt-6">
-        {steps.map((_, i) => (
+        {steps.map((_, index) => (
           <div
-            key={i}
+            key={index}
             className={`w-2 h-2 rounded-full transition-all ${
-              i === step ? 'w-6 bg-terracotta' : i < step ? 'bg-terracotta opacity-50' : 'bg-amber-200'
+              index === step ? 'w-6 bg-terracotta' : index < step ? 'bg-terracotta opacity-50' : 'bg-amber-200'
             }`}
           />
         ))}

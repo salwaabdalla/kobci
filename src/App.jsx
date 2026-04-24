@@ -1,8 +1,9 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { useApp } from './context/AppContext'
 import Navigation from './components/Navigation'
-import Landing from './pages/Landing'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import AICoach from './pages/AICoach'
@@ -16,9 +17,27 @@ import Grow from './pages/Grow'
 import Inspire from './pages/Inspire'
 import Settings from './pages/Settings'
 
+function FullScreenLoader() {
+  return (
+    <div className="min-h-screen bg-sand flex flex-col items-center justify-center px-4">
+      <div
+        className="w-10 h-10 rounded-full border-4 border-amber-100 border-t-transparent animate-spin mb-4"
+        style={{ borderTopColor: '#C4623B' }}
+      />
+      <p className="font-heading text-xl text-brown">Xogta la soo rarayo...</p>
+    </div>
+  )
+}
+
+function NetworkBanner() {
+  return (
+    <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[60] bg-amber-50 border border-amber-200 text-brown text-sm px-4 py-2 rounded-full shadow-sm">
+      Xiriirka internetka hubi
+    </div>
+  )
+}
+
 function ProtectedLayout({ children }) {
-  const { userProfile } = useApp()
-  if (!userProfile) return <Navigate to="/" replace />
   return (
     <div className="flex min-h-screen bg-sand">
       <Navigation />
@@ -31,58 +50,101 @@ function ProtectedLayout({ children }) {
   )
 }
 
+function PublicRoute({ children }) {
+  const { user, userProfile, authLoading, dataLoading } = useApp()
+
+  if (authLoading || (user && dataLoading)) {
+    return <FullScreenLoader />
+  }
+
+  if (user) {
+    return <Navigate to={userProfile ? '/dashboard' : '/onboarding'} replace />
+  }
+
+  return children
+}
+
+function OnboardingRoute({ children }) {
+  const { user, userProfile, authLoading, dataLoading } = useApp()
+
+  if (authLoading || (user && dataLoading)) {
+    return <FullScreenLoader />
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (userProfile) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  return children
+}
+
+function ProtectedRoute({ children }) {
+  const { user, userProfile, authLoading, dataLoading } = useApp()
+
+  if (authLoading || (user && dataLoading)) {
+    return <FullScreenLoader />
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (!userProfile) {
+    return <Navigate to="/onboarding" replace />
+  }
+
+  return <ProtectedLayout>{children}</ProtectedLayout>
+}
+
 export default function App() {
-  const { userProfile } = useApp()
+  const { networkWarning } = useApp()
 
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route
-        path="/dashboard"
-        element={<ProtectedLayout><Dashboard /></ProtectedLayout>}
-      />
-      <Route
-        path="/coach"
-        element={<ProtectedLayout><AICoach /></ProtectedLayout>}
-      />
-      <Route
-        path="/money"
-        element={<ProtectedLayout><MoneyHub /></ProtectedLayout>}
-      />
-      <Route
-        path="/stock"
-        element={<ProtectedLayout><StockSales /></ProtectedLayout>}
-      />
-      <Route
-        path="/suppliers"
-        element={<ProtectedLayout><SupplierDirectory /></ProtectedLayout>}
-      />
-      <Route
-        path="/mentors"
-        element={<ProtectedLayout><MentorMatching /></ProtectedLayout>}
-      />
-      <Route
-        path="/forecast"
-        element={<ProtectedLayout><SeasonalForecast /></ProtectedLayout>}
-      />
-      <Route
-        path="/business-plan"
-        element={<ProtectedLayout><BusinessPlan /></ProtectedLayout>}
-      />
-      <Route
-        path="/grow"
-        element={<ProtectedLayout><Grow /></ProtectedLayout>}
-      />
-      <Route
-        path="/inspire"
-        element={<ProtectedLayout><Inspire /></ProtectedLayout>}
-      />
-      <Route
-        path="/settings"
-        element={<ProtectedLayout><Settings /></ProtectedLayout>}
-      />
-      <Route path="*" element={<Navigate to={userProfile ? '/dashboard' : '/'} replace />} />
-    </Routes>
+    <>
+      {networkWarning && <NetworkBanner />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route
+          path="/login"
+          element={(
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          )}
+        />
+        <Route
+          path="/signup"
+          element={(
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          )}
+        />
+        <Route
+          path="/onboarding"
+          element={(
+            <OnboardingRoute>
+              <Onboarding />
+            </OnboardingRoute>
+          )}
+        />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/coach" element={<ProtectedRoute><AICoach /></ProtectedRoute>} />
+        <Route path="/money" element={<ProtectedRoute><MoneyHub /></ProtectedRoute>} />
+        <Route path="/stock" element={<ProtectedRoute><StockSales /></ProtectedRoute>} />
+        <Route path="/suppliers" element={<ProtectedRoute><SupplierDirectory /></ProtectedRoute>} />
+        <Route path="/mentors" element={<ProtectedRoute><MentorMatching /></ProtectedRoute>} />
+        <Route path="/forecast" element={<ProtectedRoute><SeasonalForecast /></ProtectedRoute>} />
+        <Route path="/business-plan" element={<ProtectedRoute><BusinessPlan /></ProtectedRoute>} />
+        <Route path="/grow" element={<ProtectedRoute><Grow /></ProtectedRoute>} />
+        <Route path="/inspire" element={<ProtectedRoute><Inspire /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
   )
 }
