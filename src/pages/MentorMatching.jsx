@@ -97,8 +97,8 @@ export default function MentorMatching() {
                 </div>
               </div>
 
-              <button onClick={() => setConnectModal(mentor)} className="btn-primary w-full mt-3 text-sm py-2">
-                Xiriir 📱
+              <button onClick={() => window.open(mentor.whatsapp, '_blank')} className="btn-primary w-full mt-3 text-sm py-2">
+                Xiriir WhatsApp
               </button>
             </div>
           )

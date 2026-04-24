@@ -25,7 +25,7 @@ export default function SplashScreen() {
         const profile = localStorage.getItem('kobcin_profile');
         navigate(profile ? '/dashboard' : '/landing');
       }, 600);
-    }, 4000);
+    }, 6000);
 
     return () => [t1,t2,t3,t4,end].forEach(clearTimeout);
   }, [navigate]);
@@ -147,7 +147,7 @@ export default function SplashScreen() {
         <div ref={barRef} style={{
           height: '100%', width: '0%',
           background: 'white',
-          transition: 'width 4s linear'
+          transition: 'width 6s linear'
         }} />
       </div>
 
