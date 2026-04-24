@@ -4,15 +4,23 @@ import { useApp } from '../context/AppContext'
 import { askCoach } from '../services/aiService'
 
 const QUICK_PROMPTS = [
-  'Sideen u qiimeeyo alaabta?',
+  'Alaabta sideen u qiimeeyo?',
   'Lacagta sideen u maareeyo?',
-  'Maxaan samayn karaa ganacsi inuu kobco?',
+  'Macaamiisha sideen u helo?',
 ]
 
-const WELCOME_MSG = {
-  id: 'welcome',
-  role: 'assistant',
-  content: 'Assalamu Calaykum! Waxaan ahay Kobcin, macallinkaa ganacsi. Maxaan kugu caawin karaa maanta?',
+function buildWelcome(userProfile) {
+  const name = userProfile?.name || 'Ganacsade'
+  const businessName = userProfile?.businessName || 'ganacsigaaga'
+  return `Subax wanaagsan ${name}! Ganacsigaaga ${businessName} maanta sidee u socday? Wax kasta oo aad dooneyso weydii — lacagta, qiimaha, ama macaamiisha.`
+}
+
+function formatAIMessage(text) {
+  return (text || '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .split('\n')
+    .filter((line) => line.trim())
 }
 
 export default function AICoach() {
@@ -25,7 +33,13 @@ export default function AICoach() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const messages = chatMessages.length > 0 ? chatMessages : [WELCOME_MSG]
+  const welcomeMsg = {
+    id: 'welcome',
+    role: 'assistant',
+    content: buildWelcome(userProfile),
+  }
+
+  const messages = chatMessages.length > 0 ? chatMessages : [welcomeMsg]
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -51,7 +65,7 @@ export default function AICoach() {
       const reply = await askCoach(userText, userProfile)
       await saveChatMessage({ role: 'assistant', content: reply.content })
     } catch {
-      await saveChatMessage({ role: 'assistant', content: 'Waxaa jiray khalad. Isku day mar kale.' })
+      await saveChatMessage({ role: 'assistant', content: 'Wax khalad ah ayaa dhacay. Dib u isku day.' })
     } finally {
       setLoading(false)
       inputRef.current?.focus()
@@ -69,11 +83,11 @@ export default function AICoach() {
           K
         </div>
         <div className="flex-1">
-          <h1 className="font-heading font-semibold text-brown">Kobcin — Macallinka AI</h1>
-          <p className="text-teal text-xs">● Diyaar u yahay inuu kaa caawiyo</p>
+          <h1 className="font-heading font-semibold text-brown">Kobcin - AI Coach</h1>
+          <p className="text-teal text-xs">● Diyaar u talin</p>
         </div>
         <button onClick={() => void handleClear()} className="text-xs text-muted hover:text-red-500 transition-colors flex-shrink-0 border border-amber-200 rounded-lg px-2 py-1">
-          🗑️ Nadiifi
+          Tirtir
         </button>
       </div>
 
@@ -92,7 +106,15 @@ export default function AICoach() {
                   : 'bg-white text-brown border border-amber-100 rounded-tl-sm shadow-sm'
               }`}
             >
-              {message.content || message.text}
+              {message.role === 'assistant' ? (
+                <div className="space-y-2">
+                  {formatAIMessage(message.content || message.text).map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
+                </div>
+              ) : (
+                message.content || message.text
+              )}
             </div>
           </div>
         ))}
@@ -104,9 +126,9 @@ export default function AICoach() {
             </div>
             <div className="bg-white border border-amber-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
               <div className="flex gap-1 items-center">
-                <div className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="w-2 h-2 bg-terracotta rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-terracotta rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-terracotta rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -139,7 +161,7 @@ export default function AICoach() {
               void send()
             }
           }}
-          placeholder="Su'aashaada geli..."
+          placeholder="Su'aashaada qor..."
           className="input-field flex-1"
           disabled={loading}
         />

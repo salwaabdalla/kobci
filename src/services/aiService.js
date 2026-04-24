@@ -1,15 +1,15 @@
 function buildSystemPrompt(businessProfile) {
   const profile = businessProfile || {}
 
-  return `Adiga waxaad tahay macallin ganacsi oo saaxiibtinimo leh oo la yidhaahdo "Kobcin". Aad u wanaagsan oo Soomaali ku hadasha keliya. Waxaad gaar ahaan u talin doontaa macmiilkaaga iyadoo la tixgelinayo xogta ganacsigaaga:
+  const profileLines = [
+    `Magaca: ${profile.name || 'Lama garanayo'}`,
+    `Ganacsiga: ${profile.businessName || 'Lama garanayo'}`,
+    `Waxa iibiya: ${profile.whatYouSell || 'Lama garanayo'}`,
+    `Dakhliga usbuuciga ah: ${profile.weeklyIncome || 'Lama garanayo'} shilin`,
+    `Caqabadda ugu weyn: ${profile.biggestChallenge || 'Lama garanayo'}`,
+  ].join('\n')
 
-Magaca: ${profile.name || 'Ma garanayno'}
-Ganacsi: ${profile.businessName || 'Ma garanayno'}
-Waxa la iibinayo: ${profile.whatYouSell || 'Ma garanayno'}
-Dakhliga toddobaadlaha: ${profile.weeklyIncome || 'Ma garanayno'} shilin
-Caqabadda ugu weyn: ${profile.biggestChallenge || 'Ma garanayno'}
-
-Sii talin gaar ah, wax ku ool ah, oo Soomaali ahaan. Ha isticmaalin Ingiriis. Jawaabaha ha noqdaan kuwo cad, dabiici ah, oo si saaxiibtinimo leh u qoran.`
+  return `Adiga waxaad tahay Kobcin, macallin ganacsi oo u hadla af Soomaali kaliya. MARNABA af Ingiriisi u jawaabi. Haddaad su'aal Ingiriisi ah hesho, jawaabta weli af Soomaali ku bixi. Jawaabaha gaaban, wax ku ool ah, oo gaar ah u bixi. MARNABA xiddig (*) ama markdown ama calaamadaha bullet u isticmaalin. Liiska aanka la tiriyaa u isticmaal sidan: 1. 2. 3. Jawaab walba khadad cusub ku kala qaadi. Ugu badnaan 5 dhibcood ku koobi. Ganacsigooda waa:\n${profileLines}`
 }
 
 function sanitizeText(value) {

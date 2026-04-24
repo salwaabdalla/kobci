@@ -8,11 +8,11 @@ const navItems = [
   { path: '/money', label: 'Lacagta', icon: '💰' },
   { path: '/stock', label: 'Kaydka', icon: '📦' },
   { path: '/suppliers', label: 'Alaab-siiyayaasha', icon: '🤝' },
-  { path: '/mentors', label: 'Bare', icon: '👩‍🏫' },
+  { path: '/mentors', label: 'Tutorrada', icon: '👩‍🏫' },
   { path: '/forecast', label: 'Saadaalinta', icon: '📊' },
   { path: '/business-plan', label: 'Ganacsiga', icon: '📋' },
-  { path: '/grow', label: 'Kordhinta', icon: '🌱' },
-  { path: '/inspire', label: 'Dhiirigelinta', icon: '⭐' },
+  { path: '/grow', label: 'Kobcinta', icon: '🌱' },
+  { path: '/inspire', label: 'Dhiiri-gelin', icon: '⭐' },
   { path: '/settings', label: 'Xogta', icon: '⚙️' },
 ]
 

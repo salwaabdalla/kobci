@@ -1,23 +1,42 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 
-const SOMALI_QUOTES = [
-  '"Naag ganacsato waa iftiinka goyska." — Xigmad Soomaali',
-  '"Hawsha maanta oo samaynaysid ayaa berri lagu mahadcelinayaa." — Xigmad Soomaali',
-  '"Gacanta bidix ka garab siiso midigta, meel fog bay gaari doonaan." — Xigmad Soomaali',
-  '"Lacag la kaydiya waa lacag la helay." — Xigmad Soomaali',
-  '"Markii aad baxdo waaberiga hore, adduunka kula kulma." — Xigmad Soomaali',
-  '"Sabar waa awood, wax kasta oo aad sabrido ayaad gaadhay." — Xigmad Soomaali',
-  '"Nin wax baraa waa nin wax leh." — Xigmad Soomaali',
-  '"Dunida ama qabso ama daa, laakiin u dayo." — Xigmad Soomaali',
-  '"Midab walba wuxuu leeyahay qurux, ganacsiga walba wuxuu leeyahay fursad." — Xigmad Soomaali',
-  '"Hawsha waxaa ka dhigta midho, samir iyo xikmad." — Xigmad Soomaali',
+function useCountUp(target, duration = 1000) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    if (!target) { setDisplay(0); return }
+    let rafId
+    const start = Date.now()
+    const tick = () => {
+      const progress = Math.min((Date.now() - start) / duration, 1)
+      setDisplay(Math.round(target * progress))
+      if (progress < 1) { rafId = requestAnimationFrame(tick) }
+    }
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
+  }, [target, duration])
+  return display
+}
+
+const QURAN_AYAHS = [
+  {
+    arabic: 'وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ',
+    somali: 'Cid kasta oo Alle ka cabsata, wuxuu u yeelaa meel uu ka baxo, wuxuuna ka arsaaqaa meel uusan filayn.',
+  },
+  {
+    arabic: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
+    somali: 'Hubaal, dhibaatada waxaa la socota fudayd.',
+  },
+  {
+    arabic: 'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ',
+    somali: 'Tawfiiqaydu waxay ka timaaddaa Alle oo keliya..',
+  },
 ]
 
 const SLOW_PERIODS = [
   { name: 'Ramadaan', startMonth: 2, endMonth: 3 },
-  { name: 'Ka dib Ciida', startMonth: 4, endMonth: 4 },
+  { name: 'iida kadib', startMonth: 4, endMonth: 4 },
 ]
 
 const SOMALI_MONTHS = [
@@ -41,7 +60,7 @@ function getWeekRange() {
 }
 
 export default function Dashboard() {
-  const { userProfile, transactions, stockItems, suppliers, savingsGoal, streak, sales } = useApp()
+  const { userProfile, transactions, stockItems, suppliers, savingsGoal, sales } = useApp()
   const navigate = useNavigate()
 
   const today = new Date()
@@ -52,12 +71,14 @@ export default function Dashboard() {
   const weekExpense = weekTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
   const weekProfit = weekIncome - weekExpense
 
-  const quote = useMemo(() => {
-    const idx = today.getDate() % SOMALI_QUOTES.length
-    return SOMALI_QUOTES[idx]
-  }, [])
+  const todayStr = today.toDateString()
+  const todayTransactions = transactions.filter(t => new Date(t.date).toDateString() === todayStr)
+  const todayIncome = todayTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+  const todayExpense = todayTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+  const lowStockCount = stockItems.filter(item => item.quantity <= (item.reorderLevel || 0)).length
 
-  // Only show slow-period warning after 14 distinct days of real sales data
+  const ayah = useMemo(() => QURAN_AYAHS[today.getDay() % QURAN_AYAHS.length], [])
+
   const uniqueSaleDays = useMemo(() => {
     return new Set(sales.map(s => new Date(s.date).toDateString())).size
   }, [sales])
@@ -76,32 +97,25 @@ export default function Dashboard() {
 
   const businessScore = useMemo(() => {
     let score = 0
-    if (transactions.length > 0) score += 20
-    if (stockItems.length > 0) score += 20
-    if (suppliers.length > 0) score += 20
-    if (streak.currentStreak > 3) score += 20
-    if (savingsGoal.target > 0) score += 20
+    if (transactions.length > 0) score += 25
+    if (stockItems.length > 0) score += 25
+    if (suppliers.length > 0) score += 25
+    if (savingsGoal.target > 0) score += 25
     return score
-  }, [transactions, stockItems, suppliers, streak, savingsGoal])
+  }, [transactions, stockItems, suppliers, savingsGoal])
 
   const savingsProgress = savingsGoal.target > 0
     ? Math.min((savingsGoal.current / savingsGoal.target) * 100, 100)
     : 0
 
-  const streakDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date()
-    d.setDate(d.getDate() - (6 - i))
-    return { label: SOMALI_DAYS[d.getDay()].slice(0, 2), filled: i >= 7 - streak.currentStreak }
-  })
-
-  const quickActions = [
-    { label: 'Lacag geli', path: '/money', icon: '💰' },
-    { label: 'Macallinka AI', path: '/coach', icon: '🤖' },
-    { label: 'Kaydka eeg', path: '/stock', icon: '📦' },
-    { label: 'Saadaalinta', path: '/forecast', icon: '📊' },
-    { label: 'Ganacsiga', path: '/business-plan', icon: '📋' },
-    { label: 'Dhiirigelinta', path: '/inspire', icon: '⭐' },
-  ]
+  const animIncome = useCountUp(weekIncome)
+  const animProfit = useCountUp(Math.abs(weekProfit))
+  const animScore = useCountUp(businessScore)
+  const animSavingsProgress = useCountUp(Math.round(savingsProgress))
+  const animSavingsCurrent = useCountUp(savingsGoal.current)
+  const animTodayIncome = useCountUp(todayIncome)
+  const animTodayExpense = useCountUp(todayExpense)
+  const animLowStock = useCountUp(lowStockCount)
 
   return (
     <div className="space-y-5">
@@ -129,7 +143,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Slow period warning — only shown after 14 days of data */}
+      {/* Slow period warning */}
       {slowWarning && (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex gap-3">
           <span className="text-orange-500 text-xl">⚠️</span>
@@ -150,33 +164,13 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Streak */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-heading font-semibold text-brown">Joogsiganaha 🔥</h2>
-          <span className="text-terracotta font-bold text-lg">{streak.currentStreak} maalmood</span>
-        </div>
-        <div className="flex gap-2">
-          {streakDays.map((d, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <div className={`w-full aspect-square rounded-full flex items-center justify-center text-xs font-medium ${
-                d.filled ? 'bg-terracotta text-white' : 'bg-amber-100 text-muted'
-              }`}>
-                {d.filled ? '✓' : ''}
-              </div>
-              <span className="text-xs text-muted">{d.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Metric cards */}
       <div className="grid grid-cols-2 gap-3">
         <div className="card">
           <p className="text-muted text-xs mb-1">Dakhliga toddobaadka</p>
           {weekIncome > 0 ? (
             <p className="font-heading text-xl font-bold text-teal">
-              {weekIncome.toLocaleString()} sh
+              {animIncome.toLocaleString()} sh
             </p>
           ) : (
             <p className="font-heading text-xl font-bold text-muted">—</p>
@@ -186,7 +180,7 @@ export default function Dashboard() {
           <p className="text-muted text-xs mb-1">Faa'iidada toddobaadka</p>
           {transactions.length > 0 ? (
             <p className={`font-heading text-xl font-bold ${weekProfit >= 0 ? 'text-teal' : 'text-red-500'}`}>
-              {weekProfit.toLocaleString()} sh
+              {weekProfit < 0 ? '-' : ''}{animProfit.toLocaleString()} sh
             </p>
           ) : (
             <p className="font-heading text-xl font-bold text-muted">—</p>
@@ -211,7 +205,7 @@ export default function Dashboard() {
           <div className="card col-span-2">
             <div className="flex justify-between items-center mb-2">
               <p className="text-muted text-xs">Bartilmaameedka kaydka</p>
-              <p className="text-terracotta text-xs font-medium">{Math.round(savingsProgress)}%</p>
+              <p className="text-terracotta text-xs font-medium">{animSavingsProgress}%</p>
             </div>
             <div className="h-2 bg-amber-100 rounded-full overflow-hidden mb-1">
               <div
@@ -220,7 +214,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex justify-between text-xs text-muted">
-              <span>{savingsGoal.current.toLocaleString()} sh</span>
+              <span>{animSavingsCurrent.toLocaleString()} sh</span>
               <span>{savingsGoal.target.toLocaleString()} sh</span>
             </div>
           </div>
@@ -245,32 +239,99 @@ export default function Dashboard() {
               />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-brown">
-              {businessScore}
+              {animScore}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Daily Quote */}
-      <div className="bg-brown rounded-xl p-4">
-        <p className="text-gold text-xs mb-1 font-medium">Maanta oo maanta</p>
-        <p className="text-sand text-sm font-body italic leading-relaxed">{quote}</p>
+      {/* Aayada Maanta */}
+      <div className="rounded-xl p-4 flex gap-3 items-start" style={{ backgroundColor: '#E8F5E9' }}>
+        <span className="text-2xl flex-shrink-0 mt-1">☪️</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium mb-2" style={{ color: '#388E3C' }}>Aayada Maanta</p>
+          <p className="text-right text-sm italic leading-relaxed mb-2" style={{ color: '#78909C', fontFamily: 'serif', direction: 'rtl' }}>
+            {ayah.arabic}
+          </p>
+          <p className="font-heading font-bold text-sm leading-relaxed" style={{ color: '#1B5E20' }}>
+            {ayah.somali}
+          </p>
+        </div>
       </div>
 
-      {/* Quick actions */}
+      {/* Today's stat cards */}
       <div>
-        <h2 className="font-heading font-semibold text-brown mb-3">Fursadaha Degdegga</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {quickActions.map((a) => (
-            <button
-              key={a.path}
-              onClick={() => navigate(a.path)}
-              className="card flex flex-col items-center gap-2 py-4 hover:border-terracotta hover:border-opacity-40 active:scale-95 transition-all cursor-pointer"
-            >
-              <span className="text-2xl">{a.icon}</span>
-              <span className="text-xs text-muted text-center leading-tight">{a.label}</span>
-            </button>
-          ))}
+        <h2 className="font-heading font-semibold text-brown mb-3">Xaaladda Maanta</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Iibka Maanta */}
+          <button
+            onClick={() => navigate('/money')}
+            className="card text-left active:scale-95 transition-all hover:border-green-300"
+          >
+            <p className="text-muted text-xs mb-1">Iibka Maanta</p>
+            <div className="flex items-end gap-1">
+              <p className="font-heading text-xl font-bold text-green-600">
+                {animTodayIncome.toLocaleString()}
+              </p>
+              <span className="text-green-600 text-xs mb-0.5">sh</span>
+              <span className="text-green-500 text-sm mb-0.5 ml-auto">↑</span>
+            </div>
+          </button>
+
+          {/* Kharashka Maanta */}
+          <button
+            onClick={() => navigate('/money')}
+            className="card text-left active:scale-95 transition-all hover:border-red-200"
+          >
+            <p className="text-muted text-xs mb-1">Kharashka Maanta</p>
+            <div className="flex items-end gap-1">
+              <p className="font-heading text-xl font-bold text-red-500">
+                {animTodayExpense.toLocaleString()}
+              </p>
+              <span className="text-red-500 text-xs mb-0.5">sh</span>
+              <span className="text-red-400 text-sm mb-0.5 ml-auto">↓</span>
+            </div>
+          </button>
+
+          {/* Kaydka Hooseeya */}
+          <button
+            onClick={() => navigate('/stock')}
+            className="card text-left active:scale-95 transition-all hover:border-orange-300"
+          >
+            <p className="text-muted text-xs mb-1">Kaydka Hooseeya</p>
+            <div className="flex items-end gap-1">
+              <p className="font-heading text-xl font-bold text-orange-500">
+                {animLowStock}
+              </p>
+              <span className="text-orange-500 text-xs mb-0.5">xidid</span>
+              <span className="text-orange-400 text-sm mb-0.5 ml-auto">⚠</span>
+            </div>
+          </button>
+
+          {/* Bartilmaameedka */}
+          <button
+            onClick={() => navigate('/money')}
+            className="card text-left active:scale-95 transition-all hover:border-teal-300"
+          >
+            <p className="text-muted text-xs mb-1">Bartilmaameedka</p>
+            <div className="flex items-center gap-2">
+              <p className="font-heading text-xl font-bold text-teal">
+                {animSavingsProgress}%
+              </p>
+              <div className="relative w-8 h-8 ml-auto flex-shrink-0">
+                <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#E8F4F1" strokeWidth="4" />
+                  <circle
+                    cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#1D9E75"
+                    strokeWidth="4"
+                    strokeDasharray={`${savingsProgress} 100`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </div>

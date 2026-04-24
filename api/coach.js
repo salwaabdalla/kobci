@@ -1,4 +1,4 @@
-const GEMINI_MODEL = 'gemini-2.0-flash'
+const GEMINI_MODEL = 'gemini-2.5-flash'
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
 const GEMINI_MAX_RETRIES = 2
 const GEMINI_RETRY_DELAY_MS = 1200
@@ -42,22 +42,16 @@ async function callGemini({ messages, system, apiKey }) {
     parts: [{ text: message.content }],
   }))
 
-  // This endpoint rejects systemInstruction/system_instruction for this model/version.
-  // To keep the behavior stable, inject the system prompt as a leading user-context message
-  // only when it exists.
-  if (system) {
-    contents.unshift({
-      role: 'user',
-      parts: [{ text: `Raac tilmaamahan nidaamka ah markaad jawaabayso:\n${system}` }],
-    })
-  }
-
   const payload = {
     contents,
     generationConfig: {
       maxOutputTokens: 1024,
       temperature: 0.7,
     },
+  }
+
+  if (system) {
+    payload.systemInstruction = { parts: [{ text: system }] }
   }
 
   for (let attempt = 0; attempt <= GEMINI_MAX_RETRIES; attempt += 1) {
